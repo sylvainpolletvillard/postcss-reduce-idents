@@ -17,7 +17,9 @@ export default {
                 valueParser(node.value).walk(child => {
                     if (child.type === 'string') {
                         child.value.split(/\s+/).forEach(word => {
-                            if (word && !RESERVED_KEYWORDS.includes(word)) {
+                            if (/\.+/.test(word)) { // reduce empty zones to a single `.`
+                                node.value = node.value.replace(word, ".");
+                            } else if (word && !RESERVED_KEYWORDS.includes(word)) {
                                 addToCache(word, encoder, cache);
                             }
                         });

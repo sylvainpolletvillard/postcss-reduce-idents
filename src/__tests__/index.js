@@ -133,14 +133,14 @@ const tests = [{
 }, {
     message: 'should rename grid-template short syntax',
     fixture: [
-        'body{grid-template: "head head" 50px "nav main" 1fr "foot foot" 30px / 150px 1fr;}',
+        'body{grid-template: "head head" 50px "nav main" 1fr "...  foot" 30px / 150px 1fr;}',
         'header { grid-area: head }',
         'nav{grid-area:nav}',
         'main{grid-area:main}',
         'footer{grid-area:foot}',
     ].join(''),
     expected: [
-        'body{grid-template: "a a" 50px "b c" 1fr "d d" 30px / 150px 1fr;}',
+        'body{grid-template: "a a" 50px "b c" 1fr ". d" 30px / 150px 1fr;}',
         'header { grid-area: a }',
         'nav{grid-area:b}',
         'main{grid-area:c}',
