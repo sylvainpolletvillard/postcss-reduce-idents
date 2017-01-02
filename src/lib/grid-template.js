@@ -19,7 +19,7 @@ export default {
                         child.value.split(/\s+/).forEach(word => {
                             if (/\.+/.test(word)) { // reduce empty zones to a single `.`
                                 node.value = node.value.replace(word, ".");
-                            } else if (word && !RESERVED_KEYWORDS.includes(word)) {
+                            } else if (word && RESERVED_KEYWORDS.indexOf(word) === -1) {
                                 addToCache(word, encoder, cache);
                             }
                         });
@@ -28,7 +28,7 @@ export default {
                 declCache.push(node);
             } else if (node.prop === 'grid-area') {
                 valueParser(node.value).walk(child => {
-                    if (child.type === 'word' && !RESERVED_KEYWORDS.includes(child.value)) {
+                    if (child.type === 'word' && RESERVED_KEYWORDS.indexOf(child.value) === -1) {
                         addToCache(child.value, encoder, cache);
                     }
                 });

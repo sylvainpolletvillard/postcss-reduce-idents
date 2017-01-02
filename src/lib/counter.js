@@ -18,7 +18,7 @@ export default {
         if (type === 'decl') {
             if (/counter-(reset|increment)/.test(prop)) {
                 node.value = valueParser(node.value).walk(child => {
-                    if (child.type === 'word' && !isNum(child) && !RESERVED_KEYWORDS.includes(child.value)) {
+                    if (child.type === 'word' && !isNum(child) && RESERVED_KEYWORDS.indexOf(child.value) === -1) {
                         addToCache(child.value, encoder, cache);
                         child.value = cache[child.value].ident;
                     } else if (child.type === 'space') {

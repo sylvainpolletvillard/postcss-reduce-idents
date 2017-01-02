@@ -16,7 +16,7 @@ export default {
 
         if (type === 'atrule') {
             let word = node.params;
-            if (/keyframes/.test(name) && !RESERVED_KEYWORDS.includes(word)) {
+            if (/keyframes/.test(name) && RESERVED_KEYWORDS.indexOf(word) === -1) {
                 addToCache(word, encoder, cache);
                 atRules.push(node);
             }
