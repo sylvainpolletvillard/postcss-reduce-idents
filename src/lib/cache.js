@@ -1,4 +1,4 @@
-export function addToCache (value, encoder, cache) {
+export default function (value, encoder, cache) {
     if (cache[value]) {
         return;
     }
@@ -6,11 +6,4 @@ export function addToCache (value, encoder, cache) {
         ident: encoder(value, Object.keys(cache).length),
         count: 0,
     };
-}
-
-export function cacheAtRule (node, encoder, {cache, ruleCache}) {
-    const {params} = node;
-    addToCache(params, encoder, cache);
-    node.params = cache[params].ident;
-    ruleCache.push(node);
 }
