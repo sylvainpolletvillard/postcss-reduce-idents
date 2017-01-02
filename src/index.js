@@ -1,86 +1,9 @@
-import valueParser, {unit, walk} from 'postcss-value-parser';
+import valueParser from 'postcss-value-parser';
 import postcss from 'postcss';
 import encode from './lib/encode';
-
-function isNum (node) {
-    return unit(node.value);
-}
-
-function transformAtRule ({cache, ruleCache, declCache}) {
-    // Iterate each property and change their names
-    declCache.forEach(decl => {
-        decl.value = valueParser(decl.value).walk(node => {
-            if (node.type === 'word' && node.value in cache) {
-                cache[node.value].count++;
-                node.value = cache[node.value].ident;
-            } else if (node.type === 'space') {
-                node.value = ' ';
-            } else if (node.type === 'div') {
-                node.before = node.after = '';
-            }
-        }).toString();
-    });
-    // Ensure that at rules with no references to them are left unchanged
-    ruleCache.forEach(rule => {
-        Object.keys(cache).forEach(key => {
-            const cached = cache[key];
-            if (cached.ident === rule.params && !cached.count) {
-                rule.params = key;
-            }
-        });
-    });
-}
-
-function transformDecl ({cache, declOneCache, declTwoCache}) {
-    declTwoCache.forEach(decl => {
-        decl.value = valueParser(decl.value).walk(node => {
-            const {type, value} = node;
-            if (type === 'function' && (value === 'counter' || value === 'counters')) {
-                walk(node.nodes, child => {
-                    if (child.type === 'word' && child.value in cache) {
-                        cache[child.value].count++;
-                        child.value = cache[child.value].ident;
-                    } else if (child.type === 'div') {
-                        child.before = child.after = '';
-                    }
-                });
-            }
-            if (type === 'space') {
-                node.value = ' ';
-            }
-            return false;
-        }).toString();
-    });
-    declOneCache.forEach(decl => {
-        decl.value = decl.value.walk(node => {
-            if (node.type === 'word' && !isNum(node)) {
-                Object.keys(cache).forEach(key => {
-                    const cached = cache[key];
-                    if (cached.ident === node.value && !cached.count) {
-                        node.value = key;
-                    }
-                });
-            }
-        }).toString();
-    });
-}
-
-function addToCache (value, encoder, cache) {
-    if (cache[value]) {
-        return;
-    }
-    cache[value] = {
-        ident: encoder(value, Object.keys(cache).length),
-        count: 0,
-    };
-}
-
-function cacheAtRule (node, encoder, {cache, ruleCache}) {
-    const {params} = node;
-    addToCache(params, encoder, cache);
-    node.params = cache[params].ident;
-    ruleCache.push(node);
-}
+import isNum from "./lib/helpers";
+import {transformDecl, transformAtRule} from "./lib/transform";
+import {cacheAtRule, addToCache} from "./lib/cache";
 
 export default postcss.plugin('postcss-reduce-idents', ({
     counter = true,
