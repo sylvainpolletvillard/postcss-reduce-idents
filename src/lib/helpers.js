@@ -1,5 +1,13 @@
 import {unit} from "postcss-value-parser";
 
-export default function isNum (node) {
+export function isNum (node) {
     return unit(node.value);
 }
+
+export const RESERVED_KEYWORDS = [
+    "auto",
+    "span",
+    "inherit",
+    "initial",
+    "unset",
+];

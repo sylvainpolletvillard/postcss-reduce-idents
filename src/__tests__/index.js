@@ -114,6 +114,40 @@ const tests = [{
     ].join(''),
     options: {counter: false},
 }, {
+    message: 'should rename grid templates',
+    fixture: [
+        'body{grid-template-areas:"head head" \n"nav  main"\n"nav  foot";}',
+        'header { grid-area: head }',
+        'nav{grid-area:nav}',
+        'main{grid-area:main}',
+        'footer{grid-area:foot}',
+    ].join(''),
+    expected: [
+        'body{grid-template-areas:"a a" "b c" "b d";}',
+        'header { grid-area: a }',
+        'nav{grid-area:b}',
+        'main{grid-area:c}',
+        'footer{grid-area:d}',
+    ].join(''),
+    options: {},
+}, {
+    message: 'should not touch to grid templates',
+    fixture: [
+        'body{grid-template-areas:"head head" \n"nav  main"\n"nav  foot";}',
+        'header { grid-area: head }',
+        'nav{grid-area:nav}',
+        'main{grid-area:main}',
+        'footer{grid-area:foot}',
+    ].join(''),
+    expected: [
+        'body{grid-template-areas:"head head" \n"nav  main"\n"nav  foot";}',
+        'header { grid-area: head }',
+        'nav{grid-area:nav}',
+        'main{grid-area:main}',
+        'footer{grid-area:foot}',
+    ].join(''),
+    options: {gridTemplate: false},
+}, {
     message: '',
     fixture: [
         '@keyframes whiteToBlack{0%{color:#fff}to{color:#000}}.one{animation: 100ms whiteToBlack}',

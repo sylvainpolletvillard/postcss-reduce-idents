@@ -1,5 +1,5 @@
 import valueParser, {walk} from 'postcss-value-parser';
-import isNum from "./helpers";
+import {isNum} from "./helpers";
 
 export function transformAtRule ({cache, ruleCache, declCache}) {
     // Iterate each property and change their names
@@ -26,7 +26,7 @@ export function transformAtRule ({cache, ruleCache, declCache}) {
     });
 }
 
-export function transformDecl ({cache, declOneCache, declTwoCache}) {
+export function transformCounterDecl ({cache, declOneCache, declTwoCache}) {
     declTwoCache.forEach(decl => {
         decl.value = valueParser(decl.value).walk(node => {
             const {type, value} = node;
@@ -56,6 +56,27 @@ export function transformDecl ({cache, declOneCache, declTwoCache}) {
                     }
                 });
             }
+        }).toString();
+    });
+}
+
+export function transformGridTemplateDecl ({cache, declCache}) {
+    declCache.forEach(decl => {
+        decl.value = valueParser(decl.value).walk(node => {
+            if (decl.prop === 'grid-template-areas') {
+                node.value.split(/\s+/).forEach(word => {
+                    if (word in cache) {
+                        node.value = node.value.replace(word, cache[word].ident);
+                    }
+                });
+                node.value = node.value.replace(/\s+/g, " "); // merge white-spaces
+            }
+            if (decl.prop === 'grid-area' && !isNum(node)) {
+                if (node.value in cache) {
+                    node.value = cache[node.value].ident;
+                }
+            }
+            return false;
         }).toString();
     });
 }

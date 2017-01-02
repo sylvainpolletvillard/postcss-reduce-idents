@@ -1,15 +1,16 @@
 import valueParser from 'postcss-value-parser';
 import postcss from 'postcss';
 import encode from './lib/encode';
-import isNum from "./lib/helpers";
-import {transformDecl, transformAtRule} from "./lib/transform";
+import {isNum, RESERVED_KEYWORDS} from "./lib/helpers";
+import {transformCounterDecl, transformGridTemplateDecl, transformAtRule} from "./lib/transform";
 import {cacheAtRule, addToCache} from "./lib/cache";
 
 export default postcss.plugin('postcss-reduce-idents', ({
     counter = true,
     counterStyle = true,
-    encoder = encode,
     keyframes = true,
+    gridTemplate = true,
+    encoder = encode,
 } = {}) => {
     return css => {
         // Encode at rule names and cache the result
@@ -27,6 +28,10 @@ export default postcss.plugin('postcss-reduce-idents', ({
         const keyframesCache = {
             cache: {},
             ruleCache: [],
+            declCache: [],
+        };
+        const gridTemplateCache = {
+            cache: {},
             declCache: [],
         };
         css.walk(node => {
@@ -55,6 +60,27 @@ export default postcss.plugin('postcss-reduce-idents', ({
                         counterCache.declTwoCache.push(node);
                     }
                 }
+                if (gridTemplate) {
+                    if (/(grid-template|grid-template-areas)/.test(prop)) {
+                        valueParser(node.value).walk(child => {
+                            if (child.type === 'string') {
+                                child.value.split(/\s+/).forEach(word => {
+                                    if (word && !RESERVED_KEYWORDS.includes(word)) {
+                                        addToCache(word, encoder, gridTemplateCache.cache);
+                                    }
+                                });
+                            }
+                        });
+                        gridTemplateCache.declCache.push(node);
+                    } else if (/grid-area/.test(prop)) {
+                        valueParser(node.value).walk(child => {
+                            if (child.type === 'word' && !RESERVED_KEYWORDS.includes(child.value)) {
+                                addToCache(child.value, encoder, gridTemplateCache.cache);
+                            }
+                        });
+                        gridTemplateCache.declCache.push(node);
+                    }
+                }
                 if (counterStyle && /(list-style|system)/.test(prop)) {
                     counterStyleCache.declCache.push(node);
                 }
@@ -63,8 +89,9 @@ export default postcss.plugin('postcss-reduce-idents', ({
                 }
             }
         });
-        counter      && transformDecl(counterCache);
+        counter      && transformCounterDecl(counterCache);
         counterStyle && transformAtRule(counterStyleCache);
         keyframes    && transformAtRule(keyframesCache);
+        gridTemplate && transformGridTemplateDecl(gridTemplateCache);
     };
 });
