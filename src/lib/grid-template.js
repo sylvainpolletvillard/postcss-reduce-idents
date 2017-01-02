@@ -16,10 +16,8 @@ let declCache = [];
 export default {
 
     collect (node, encoder) {
-        const {prop, type} = node;
-
-        if (type === 'decl') {
-            if (/(grid-template|grid-template-areas)/.test(prop)) {
+        if (node.type === 'decl') {
+            if (/(grid-template|grid-template-areas)/.test(node.prop)) {
                 valueParser(node.value).walk(child => {
                     if (child.type === 'string') {
                         child.value.split(/\s+/).forEach(word => {
@@ -30,7 +28,7 @@ export default {
                     }
                 });
                 declCache.push(node);
-            } else if (/grid-area/.test(prop)) {
+            } else if (node.prop === 'grid-area') {
                 valueParser(node.value).walk(child => {
                     if (child.type === 'word' && !RESERVED_KEYWORDS.includes(child.value)) {
                         addToCache(child.value, encoder, cache);
@@ -44,7 +42,7 @@ export default {
     transform () {
         declCache.forEach(decl => {
             decl.value = valueParser(decl.value).walk(node => {
-                if (decl.prop === 'grid-template-areas') {
+                if (/(grid-template|grid-template-areas)/.test(decl.prop)) {
                     node.value.split(/\s+/).forEach(word => {
                         if (word in cache) {
                             node.value = node.value.replace(word, cache[word].ident);

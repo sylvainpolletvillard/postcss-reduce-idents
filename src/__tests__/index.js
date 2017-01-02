@@ -114,7 +114,7 @@ const tests = [{
     ].join(''),
     options: {counter: false},
 }, {
-    message: 'should rename grid templates',
+    message: 'should rename grid-template-areas and grid-area',
     fixture: [
         'body{grid-template-areas:"head head" \n"nav  main"\n"nav  foot";}',
         'header { grid-area: head }',
@@ -124,6 +124,23 @@ const tests = [{
     ].join(''),
     expected: [
         'body{grid-template-areas:"a a" "b c" "b d";}',
+        'header { grid-area: a }',
+        'nav{grid-area:b}',
+        'main{grid-area:c}',
+        'footer{grid-area:d}',
+    ].join(''),
+    options: {},
+}, {
+    message: 'should rename grid-template short syntax',
+    fixture: [
+        'body{grid-template: "head head" 50px "nav main" 1fr "foot foot" 30px / 150px 1fr;}',
+        'header { grid-area: head }',
+        'nav{grid-area:nav}',
+        'main{grid-area:main}',
+        'footer{grid-area:foot}',
+    ].join(''),
+    expected: [
+        'body{grid-template: "a a" 50px "b c" 1fr "d d" 30px / 150px 1fr;}',
         'header { grid-area: a }',
         'nav{grid-area:b}',
         'main{grid-area:c}',
@@ -147,6 +164,17 @@ const tests = [{
         'footer{grid-area:foot}',
     ].join(''),
     options: {gridTemplate: false},
+}, {
+    message: 'should not rename reserved keywords in grid areas',
+    fixture: [
+        'body{grid-template: repeat(4, 1fr) / auto 100px;}',
+        'main{grid-area: 2 / 2 / auto / span 3;}',
+    ].join(''),
+    expected: [
+        'body{grid-template: repeat(4, 1fr) / auto 100px;}',
+        'main{grid-area: 2 / 2 / auto / span 3;}',
+    ].join(''),
+    options: {gridTemplate: true},
 }, {
     message: '',
     fixture: [
