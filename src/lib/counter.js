@@ -2,6 +2,10 @@ import valueParser, {walk} from "postcss-value-parser";
 import addToCache from "./cache";
 import isNum from "./isNum";
 
+const RESERVED_KEYWORDS = [
+    "unset", "initial", "inherit", "none",
+];
+
 let cache        = {};
 let declOneCache = [];
 let declTwoCache = [];
@@ -14,7 +18,7 @@ export default {
         if (type === 'decl') {
             if (/counter-(reset|increment)/.test(prop)) {
                 node.value = valueParser(node.value).walk(child => {
-                    if (child.type === 'word' && !isNum(child)) {
+                    if (child.type === 'word' && !isNum(child) && !RESERVED_KEYWORDS.includes(child.value)) {
                         addToCache(child.value, encoder, cache);
                         child.value = cache[child.value].ident;
                     } else if (child.type === 'space') {

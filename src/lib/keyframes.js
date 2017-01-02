@@ -1,6 +1,10 @@
 import valueParser from "postcss-value-parser";
 import addToCache from "./cache";
 
+const RESERVED_KEYWORDS = [
+    "none", "inherit", "initial", "unset",
+];
+
 let cache   = {};
 let atRules = [];
 let decls   = [];
@@ -11,8 +15,9 @@ export default {
         const {name, prop, type} = node;
 
         if (type === 'atrule') {
-            if (/keyframes/.test(name)) {
-                addToCache(node.params, encoder, cache);
+            let word = node.params;
+            if (/keyframes/.test(name) && !RESERVED_KEYWORDS.includes(word)) {
+                addToCache(word, encoder, cache);
                 atRules.push(node);
             }
         }

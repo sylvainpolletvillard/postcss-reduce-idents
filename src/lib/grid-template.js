@@ -3,11 +3,7 @@ import addToCache from "./cache";
 import isNum from "./isNum";
 
 const RESERVED_KEYWORDS = [
-    "auto",
-    "span",
-    "inherit",
-    "initial",
-    "unset",
+    "auto", "span", "inherit", "initial", "unset",
 ];
 
 let cache     = {};

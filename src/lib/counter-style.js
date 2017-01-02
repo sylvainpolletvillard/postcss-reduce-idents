@@ -1,6 +1,18 @@
 import valueParser from "postcss-value-parser";
 import addToCache from "./cache";
 
+const RESERVED_KEYWORDS = [
+    "unset", "initial", "inherit", "none", "inline", "outside",
+    "disc", "circle", "square", "decimal", "cjk-decimal", "decimal-leading-zero", "lower-roman", "upper-roman",
+    "lower-greek", "lower-alpha", "lower-latin", "upper-alpha", "upper-latin", "arabic-indic", "armenian",
+    "bengali", "cambodian", "cjk-earthly-branch", "cjk-heavenly-stem", "cjk-ideographic", "devanagari",
+    "ethiopic-numeric", "georgian", "gujarati", "gurmukhi", "hebrew", "hiragana", "hiragana-iroha", "japanese-formal",
+    "japanese-informal", "kannada", "katakana", "katakana-iroha", "khmer", "korean-hangul-formal",
+    "korean-hanja-formal", "korean-hanja-informal", "lao", "lower-armenian", "malayalam", "mongolian", "myanmar",
+    "oriya", "persian", "simp-chinese-formal", "simp-chinese-informal", "tamil", "telugu", "thai", "tibetan",
+    "trad-chinese-formal", "trad-chinese-informal", "upper-armenian", "disclosure-open", "disclosure-close",
+];
+
 let cache   = {};
 let atRules = [];
 let decls   = [];
@@ -11,8 +23,9 @@ export default {
         const {name, prop, type} = node;
 
         if (type === 'atrule') {
-            if (/counter-style/.test(name)) {
-                addToCache(node.params, encoder, cache);
+            let word = node.params;
+            if (/counter-style/.test(name) && !RESERVED_KEYWORDS.includes(word)) {
+                addToCache(word, encoder, cache);
                 atRules.push(node);
             }
         }
