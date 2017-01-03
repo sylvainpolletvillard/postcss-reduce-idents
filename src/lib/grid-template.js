@@ -12,28 +12,30 @@ let declCache = [];
 export default {
 
     collect (node, encoder) {
-        if (node.type === 'decl') {
-            if (/(grid-template|grid-template-areas)/.test(node.prop)) {
-                valueParser(node.value).walk(child => {
-                    if (child.type === 'string') {
-                        child.value.split(/\s+/).forEach(word => {
-                            if (/\.+/.test(word)) { // reduce empty zones to a single `.`
-                                node.value = node.value.replace(word, ".");
-                            } else if (word && RESERVED_KEYWORDS.indexOf(word) === -1) {
-                                addToCache(word, encoder, cache);
-                            }
-                        });
-                    }
-                });
-                declCache.push(node);
-            } else if (node.prop === 'grid-area') {
-                valueParser(node.value).walk(child => {
-                    if (child.type === 'word' && RESERVED_KEYWORDS.indexOf(child.value) === -1) {
-                        addToCache(child.value, encoder, cache);
-                    }
-                });
-                declCache.push(node);
-            }
+        if (node.type !== 'decl') {
+            return;
+        }
+
+        if (/(grid-template|grid-template-areas)/.test(node.prop)) {
+            valueParser(node.value).walk(child => {
+                if (child.type === 'string') {
+                    child.value.split(/\s+/).forEach(word => {
+                        if (/\.+/.test(word)) { // reduce empty zones to a single `.`
+                            node.value = node.value.replace(word, ".");
+                        } else if (word && RESERVED_KEYWORDS.indexOf(word) === -1) {
+                            addToCache(word, encoder, cache);
+                        }
+                    });
+                }
+            });
+            declCache.push(node);
+        } else if (node.prop === 'grid-area') {
+            valueParser(node.value).walk(child => {
+                if (child.type === 'word' && RESERVED_KEYWORDS.indexOf(child.value) === -1) {
+                    addToCache(child.value, encoder, cache);
+                }
+            });
+            declCache.push(node);
         }
     },
 

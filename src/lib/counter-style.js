@@ -22,17 +22,17 @@ export default {
     collect (node, encoder) {
         const {name, prop, type} = node;
 
-        if (type === 'atrule') {
-            let word = node.params;
-            if (/counter-style/.test(name) && RESERVED_KEYWORDS.indexOf(word) === -1) {
-                addToCache(word, encoder, cache);
-                atRules.push(node);
-            }
+        if (
+            type === 'atrule' &&
+            /counter-style/.test(name) &&
+            RESERVED_KEYWORDS.indexOf(node.params) === -1
+        ) {
+            addToCache(node.params, encoder, cache);
+            atRules.push(node);
         }
-        if (type === 'decl') {
-            if (/(list-style|system)/.test(prop)) {
-                decls.push(node);
-            }
+
+        if (type === 'decl' && /(list-style|system)/.test(prop)) {
+            decls.push(node);
         }
     },
 

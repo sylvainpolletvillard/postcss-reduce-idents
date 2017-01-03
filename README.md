@@ -69,7 +69,7 @@ The following example will not be transformed in any way:
 }
 ```
 
-It works for `@keyframes`, `@counter-style`, custom `counter` values and grid areas definitions. See the
+It works for `@keyframes`, `@counter-style`, custom `counter` values and grid area definitions. See the
 [documentation][idents] for more information, or the [tests](test.js) for more
 examples.
 

@@ -15,20 +15,28 @@ export default {
     collect (node, encoder) {
         const {prop, type} = node;
 
-        if (type === 'decl') {
-            if (/counter-(reset|increment)/.test(prop)) {
-                node.value = valueParser(node.value).walk(child => {
-                    if (child.type === 'word' && !isNum(child) && RESERVED_KEYWORDS.indexOf(child.value) === -1) {
-                        addToCache(child.value, encoder, cache);
-                        child.value = cache[child.value].ident;
-                    } else if (child.type === 'space') {
-                        child.value = ' ';
-                    }
-                });
-                declOneCache.push(node);
-            } else if (/content/.test(prop)) {
-                declTwoCache.push(node);
-            }
+        if (type !== 'decl') {
+            return;
+        }
+
+        if (/counter-(reset|increment)/.test(prop)) {
+            node.value = valueParser(node.value).walk(child => {
+                if (
+                    child.type === 'word' &&
+                    !isNum(child) &&
+                    RESERVED_KEYWORDS.indexOf(child.value) === -1
+                ) {
+                    addToCache(child.value, encoder, cache);
+                    child.value = cache[child.value].ident;
+                }
+
+                if (child.type === 'space') {
+                    child.value = ' ';
+                }
+            });
+            declOneCache.push(node);
+        } else if (/content/.test(prop)) {
+            declTwoCache.push(node);
         }
     },
 

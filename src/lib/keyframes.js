@@ -14,17 +14,17 @@ export default {
     collect (node, encoder) {
         const {name, prop, type} = node;
 
-        if (type === 'atrule') {
-            let word = node.params;
-            if (/keyframes/.test(name) && RESERVED_KEYWORDS.indexOf(word) === -1) {
-                addToCache(word, encoder, cache);
-                atRules.push(node);
-            }
+        if (
+            type === 'atrule' &&
+            /keyframes/.test(name) &&
+            RESERVED_KEYWORDS.indexOf(node.params) === -1
+        ) {
+            addToCache(node.params, encoder, cache);
+            atRules.push(node);
         }
-        if (type === 'decl') {
-            if (/animation/.test(prop)) {
-                decls.push(node);
-            }
+
+        if (type === 'decl' && /animation/.test(prop)) {
+            decls.push(node);
         }
     },
 
